@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main() {
-    // matriz 10x10 para representar o tabuleiro
+    // declara amatriz 10x10 para representar o tabuleiro
     int tabuleiro[10][10];
     int i, j;
     
@@ -24,11 +24,11 @@ int main() {
     
     // Coordenadas dos navios
     // Navio 1: Horizontal na linha 2, colunas 1, 2, 3
-    int navio1_linha = 2;
-    int navio1_coluna = 1;
+    int navio1_linha = 3;
+    int navio1_coluna = 4;
     
     // Navio 2: Vertical nas linhas 5, 6, 7, coluna 7
-    int navio2_linha = 5;
+    int navio2_linha = 3;
     int navio2_coluna = 7;
     
     // verifica se os navios estão dentro dos limites
@@ -41,6 +41,14 @@ int main() {
     // Navio 2 vertical: verifica se linha final está dentro do limite
     if (navio2_linha < 0 || navio2_linha + 2 >= 10 || navio2_coluna < 0 || navio2_coluna >= 10) {
         printf("ERRO: Navio 2 esta fora dos limites do tabuleiro!\n");
+        return 1;
+    }
+    
+    // Verifica se a linha do navio 1 está entre as linhas do navio 2
+    // E se a coluna do navio 2 está entre as colunas do navio 1
+    if ((navio1_linha >= navio2_linha && navio1_linha <= navio2_linha + 2) &&
+        (navio2_coluna >= navio1_coluna && navio2_coluna <= navio1_coluna + 2)) {
+        printf("ERRO: Os navios se sobrepoem!\n");
         return 1;
     }
     
