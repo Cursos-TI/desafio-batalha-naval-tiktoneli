@@ -179,8 +179,148 @@ int main() {
         tabuleiro[navio4_linha + i][navio4_coluna - i] = navio4[i];
     }
     
-    // Exibe o tabuleiro no console
-    printf("Tabuleiro (0 = agua, 3 = navio):\n");
+    // Cria matrizes de habilidade (3x5 cada)
+    int cone[3][5];
+    int cruz[3][5];
+    int octaedro[3][5];
+    
+    // Constrói matriz do Cone
+    // Formato: pequeno no topo, expandindo para baixo
+    // Matriz 3x5: centro na [linha 1, coluna 2]
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 5; j++) {
+            int centro_coluna = 2; // centro da coluna na matriz 3x5
+            int distancia_centro = (j > centro_coluna) ? (j - centro_coluna) : (centro_coluna - j);
+            
+            // Cone: expande conforme a linha aumenta
+            // Linha 0: apenas centro (distância 0)
+            // Linha 1: centro ± 1
+            // Linha 2: centro ± 2 (máximo para formar base do cone)
+            if (distancia_centro <= i) {
+                cone[i][j] = 1;
+            } else {
+                cone[i][j] = 0;
+            }
+        }
+    }
+    
+    // Constrói matriz da Cruz (origem no centro)
+    // Centro na linha 1, coluna 2
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 5; j++) {
+            int centro_linha = 1; // centro da linha
+            int centro_coluna = 2; // centro da coluna
+
+            if (i == centro_linha || j == centro_coluna) {
+                cruz[i][j] = 1;
+            } else {
+                cruz[i][j] = 0;
+            }
+        }
+    }
+    
+    // Constrói matriz do Octaedro (losango)
+    // Formato: linha 0: apenas centro, linha 1: centro ± 1, linha 2: apenas centro
+    // Centro na linha 1, coluna 2
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 5; j++) {
+            int centro_linha = 1;
+            int centro_coluna = 2;
+            int distancia_centro_linha = (i > centro_linha) ? (i - centro_linha) : (centro_linha - i);
+            int distancia_centro_coluna = (j > centro_coluna) ? (j - centro_coluna) : (centro_coluna - j);
+            int distancia_centro = distancia_centro_linha + distancia_centro_coluna;
+            
+            // Losango: distância <= 1 (forma losango menor)
+            // Linha 0: distância <= 1 (mas só centro, então <= 0)
+            // Linha 1: distância <= 1 (colunas 1, 2, 3)
+            // Linha 2: distância <= 1 (mas só centro, então <= 0)
+            if (distancia_centro <= 1) {
+                octaedro[i][j] = 1;
+            } else {
+                octaedro[i][j] = 0;
+            }
+        }
+    }
+    
+    // Cria matriz separada para exibir as habilidades
+    int tabuleiro_habilidades[10][10];
+    
+    // Inicializa a matriz de habilidades com 0
+    for (i = 0; i < 10; i++) {
+        for (j = 0; j < 10; j++) {
+            tabuleiro_habilidades[i][j] = 0;
+        }
+    }
+    
+    // Define pontos de origem para cada habilidade no tabuleiro
+    int cone_origem_linha = 1;
+    int cone_origem_coluna = 2;
+    
+    int cruz_origem_linha = 4;
+    int cruz_origem_coluna = 4;
+    
+    int octaedro_origem_linha = 7;
+    int octaedro_origem_coluna = 6;
+    
+    // Aplica habilidade Cone na matriz de habilidades
+    // Centro da matriz de habilidade (1,2) é posicionado na origem
+    int offset_linha, offset_coluna;
+    int tab_linha, tab_coluna;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 5; j++) {
+            if (cone[i][j] == 1) {
+                // Calcula offset relativo ao centro da matriz (1,2)
+                offset_linha = i - 1;
+                offset_coluna = j - 2;
+                
+                // Calcula posição no tabuleiro
+                tab_linha = cone_origem_linha + offset_linha;
+                tab_coluna = cone_origem_coluna + offset_coluna;
+                
+                // Verifica se está dentro dos limites do tabuleiro
+                if (tab_linha >= 0 && tab_linha < 10 && tab_coluna >= 0 && tab_coluna < 10) {
+                    tabuleiro_habilidades[tab_linha][tab_coluna] = 1; // Cone = 1
+                }
+            }
+        }
+    }
+    
+    // Aplica habilidade Cruz na matriz de habilidades
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 5; j++) {
+            if (cruz[i][j] == 1) {
+                offset_linha = i - 1;
+                offset_coluna = j - 2;
+                
+                tab_linha = cruz_origem_linha + offset_linha;
+                tab_coluna = cruz_origem_coluna + offset_coluna;
+                
+                if (tab_linha >= 0 && tab_linha < 10 && tab_coluna >= 0 && tab_coluna < 10) {
+                    tabuleiro_habilidades[tab_linha][tab_coluna] = 2; // Cruz = 2
+                }
+            }
+        }
+    }
+    
+    // Aplica habilidade Octaedro na matriz de habilidades
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 5; j++) {
+            if (octaedro[i][j] == 1) {
+                offset_linha = i - 1;
+                offset_coluna = j - 2;
+                
+                tab_linha = octaedro_origem_linha + offset_linha;
+                tab_coluna = octaedro_origem_coluna + offset_coluna;
+                
+                if (tab_linha >= 0 && tab_linha < 10 && tab_coluna >= 0 && tab_coluna < 10) {
+                    tabuleiro_habilidades[tab_linha][tab_coluna] = 3; // Octaedro = 3
+                }
+            }
+        }
+    }
+    
+    // Exibe o tabuleiro com navios
+    printf("Tabuleiro com Navios (0 = agua, 3 = navio):\n");
     printf("   ");
     for (j = 0; j < 10; j++) {
         printf("%d ", j);
@@ -195,5 +335,21 @@ int main() {
         printf("\n");
     }
     
+    // Exibe o tabuleiro com habilidades
+    printf("\nTabuleiro com Habilidades (0 = agua, 1 = Cone, 2 = Cruz, 3 = Octaedro):\n");
+    printf("   ");
+    for (j = 0; j < 10; j++) {
+        printf("%d ", j);
+    }
+    printf("\n");
+    
+    for (i = 0; i < 10; i++) {
+        printf("%2d ", i);
+        for (j = 0; j < 10; j++) {
+            printf("%d ", tabuleiro_habilidades[i][j]);
+        }
+        printf("\n");
+    }
+
     return 0;
 }
